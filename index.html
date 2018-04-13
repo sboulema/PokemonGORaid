@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Raid Counters - Pokemon GO</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="shortcut icon" type="image/png" href="https://pokemongo.gamepress.gg/sites/default/files/inline-images/Raid-boss-counters.png"/>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css">
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+</head>
+<body>
+    <table id="result-table" class="display" width="100%"></table>
+
+    <br>
+
+    <center>
+        <strong>Counter scores</strong>
+        <table id="score-table">
+            <thead><tr><th>Name</th><th>Score</th></tr></thead>
+            <tbody></tbody>
+        </table>
+    </center>
+
+    <script>
+        $(document).ready(function() {
+            $.extend({
+                getUrlVars: function(){
+                    var vars = [], hash;
+                    var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
+                    for(var i = 0; i < hashes.length; i++)
+                    {
+                    hash = hashes[i].split('=');
+                    vars.push(hash[0]);
+                    vars[hash[0]] = hash[1];
+                    }
+                    return vars;
+                },
+                getUrlVar: function(name){
+                    return $.getUrlVars()[name];
+                }
+            });
+
+            if (typeof $.getUrlVar("q") !== 'undefined') {
+                loadSuggestions($.getUrlVar("q"));
+            } else {
+                loadDb();
+            }          
+        });
+
+        function loadSuggestions(query) {
+            $.getJSON("https://s3.us-east-2.amazonaws.com/gamepress-json/pogo/pokemon-search.json", function(data) {
+                var response = [];
+                response.push(query);
+                var suggestions = data
+                    .filter(pokemon => pokemon.text.toLowerCase().includes(query))
+                    .map(pokemon => pokemon.text);
+                response.push(suggestions);
+                return response;
+            });
+        }
+
+        function loadDb() {
+            $("#result-table").empty();
+
+            var thead = $('<thead>');
+            var tr = $("<tr><th>Raid Boss</th><th>Counter</th></tr>");
+            thead.append(tr);
+            $("#result-table").append(thead);
+
+            var tbody = $('<tbody>');
+
+            var scoreDict = {};
+
+            $.getJSON("https://api.apify.com/v1/hAjMbZPu7YxDJQ4Jj/crawlers/sZxRWSA7rbrQCZZPs/lastExec/results?token=ujHs4RKKB7L4Tp4gbRzoqkuA3&simplified=1", function(data) {
+                $.each(data, function(index, row) {
+                    if (index > 0) {
+                        tbody.append("<tr>" + 
+                        "<td>" + 
+                            "<img style='vertical-align:middle' width='24' src='https://pokemongo.gamepress.gg" + row.bossImage + ".png' />" +
+                            "<a href='" + row.url + "'>" + row.boss + "</a>" + 
+                        "</td>" + 
+                        "<td>" + 
+                            "<img style='vertical-align:middle' width='24' src='https://pokemongo.gamepress.gg" + row.image + ".png' />" + 
+                            "<a href='https://pokemongo.gamepress.gg/pokemon/" + row.id + "'>" + row.name + "</a>" + 
+                        "</td></tr>");
+                    }                
+                });
+
+                $("#result-table").append(tbody);
+
+                $('#result-table').DataTable();
+
+                $.each(data, function(index, row) {
+                    if (index > 0) {
+                        if (typeof scoreDict[row.name] == 'undefined') {
+                            scoreDict[row.name] = 1;
+                        } else {
+                            scoreDict[row.name]++;
+                        }  
+                    }
+                });
+
+                for (name in scoreDict){
+                    var score = scoreDict[name];
+                    var pokemon = getPokemonData(data, name);
+
+		    if (typeof pokemon !== 'undefined') {
+                    $("#score-table tbody").append("<tr><td>" + 
+                        "<img style='vertical-align:middle' width='24' src='https://pokemongo.gamepress.gg" + pokemon.image + ".png' />" + 
+                        "<a href='https://pokemongo.gamepress.gg/pokemon/" + pokemon.id + "'>" + name + "</a>" + "</td><td>" + score + "</td></tr>");
+		    }
+                }
+
+                $('#score-table').DataTable( {
+                    "order": [[ 1, "desc" ]],
+                    "searching": false,
+                    "lengthChange": false,
+                    "scrollY": "200px",
+                    "scrollCollapse": true,
+                    "paging": false,
+                    "info": false
+                } );
+            });
+        }
+
+        function getPokemonData(data, name) {
+            return data.find( pokemon => pokemon.name === name );
+        }
+    </script>
+</body>
+</html>
