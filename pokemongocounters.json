@@ -1,7 +1,7 @@
 {
   "_id": "sZxRWSA7rbrQCZZPs",
   "clickableElementsSelector": ".view-raid-boss-counters-list a",
-  "pageFunction": "function pageFunction(context) {\n    // called on every page the crawler visits, use it to extract data from it\n    var $ = context.jQuery;\n    \n    var raid = {};\n    raid.counters = [];\n    \n    var pageTitle = $(\".page-title\").text();\n    raid.boss = pageTitle.substring(0, pageTitle.length - 20);\n    \n    $(\".views-field-field-graph-pokemon\").each(function() {\n        var name = $(this).find(\"a\").text().trim();\n        if (name !== \"\\n\") {\n            raid.counters.push({\n                id: $(this).find(\"a\").attr(\"href\").substring(9),\n                name: name,\n                image: $(this).find(\".image-style-pokemon-small\").attr(\"src\"),\n                boss: raid.boss,\n                bossImage: $(\".pokemon-raid-boss-image img\").attr(\"src\")\n            });\n        }\n    });\n    \n    return raid.counters;\n}",
+  "pageFunction": "function pageFunction(context) {\n    // called on every page the crawler visits, use it to extract data from it\n    var $ = context.jQuery;\n    \n    var raid = {};\n    raid.counters = [];\n    \n    var pageTitle = $(\".page-title\").text();\n    raid.boss = $(\".pokemon-raid-boss-image img\").attr(\"alt\");\n    \n    $(\".views-field-field-graph-pokemon\").each(function() {\n        var name = $(this).find(\"a\").text().trim();\n        if (name !== \"\\n\") {\n            raid.counters.push({\n                id: $(this).find(\"a\").attr(\"href\").substring(9),\n                name: name,\n                image: $(this).find(\".image-style-pokemon-small\").attr(\"src\"),\n                boss: raid.boss,\n                bossImage: $(\".pokemon-raid-boss-image img\").attr(\"src\")\n            });\n        }\n    });\n    \n    return raid.counters;\n}",
   "interceptRequest": "function interceptRequest(context, newRequest) {\n    // called whenever the crawler finds a link to a new page,\n    // use it to override default behavior\n    return newRequest;\n}",
   "loadImages": false,
   "loadCss": false,
@@ -11,7 +11,7 @@
   "ownerUserId": "hAjMbZPu7YxDJQ4Jj",
   "customId": "pokemongocounters",
   "createdAt": "2018-01-10T12:25:05.269Z",
-  "modifiedAt": "2018-01-10T12:25:05.269Z",
+  "modifiedAt": "2018-04-26T12:14:45.857Z",
   "comments": null,
   "startUrls": [
     {
@@ -52,13 +52,13 @@
   "rotateUserAgents": false,
   "executeUrl": "https://api.apify.com/v1/hAjMbZPu7YxDJQ4Jj/crawlers/sZxRWSA7rbrQCZZPs/execute?token=cFYK5BnixwL7B4M8CK9kKXFjm",
   "lastExecution": {
-    "_id": "Ern7dr8vqjT8393Kq",
-    "startedAt": "2018-04-13T00:00:00.817Z",
-    "finishedAt": "2018-04-13T00:07:03.954Z",
+    "_id": "ahrarpui4rP77PJ75",
+    "startedAt": "2018-04-26T12:14:53.105Z",
+    "finishedAt": "2018-04-26T12:20:24.038Z",
     "status": "SUCCEEDED",
     "pagesCrawled": 65,
-    "detailsUrl": "https://api.apify.com/v1/execs/Ern7dr8vqjT8393Kq",
-    "resultsUrl": "https://api.apify.com/v1/execs/Ern7dr8vqjT8393Kq/results"
+    "detailsUrl": "https://api.apify.com/v1/execs/ahrarpui4rP77PJ75",
+    "resultsUrl": "https://api.apify.com/v1/execs/ahrarpui4rP77PJ75/results"
   },
   "settingsUrl": "https://api.apify.com/v1/hAjMbZPu7YxDJQ4Jj/crawlers/sZxRWSA7rbrQCZZPs?token=nPya5AX5W8Z6KPYejJrAdZ7cy",
   "executionsListUrl": "https://api.apify.com/v1/hAjMbZPu7YxDJQ4Jj/crawlers/sZxRWSA7rbrQCZZPs/execs?token=ujHs4RKKB7L4Tp4gbRzoqkuA3",
